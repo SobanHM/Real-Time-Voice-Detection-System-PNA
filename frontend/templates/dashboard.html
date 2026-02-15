@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Admin Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='dashboard.css') }}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+
+<div class="dashboard-container">
+
+    <h1>Admin Dashboard</h1>
+
+    <div class="stats-grid">
+
+        <div class="card">
+            <h3>Overall Accuracy</h3>
+            <p>{{ metrics.overall_accuracy * 100 }}%</p>
+        </div>
+
+        <div class="card">
+            <h3>Total Speakers</h3>
+            <p>{{ metrics.total_speakers }}</p>
+        </div>
+
+    </div>
+
+    <div class="chart-section">
+        <h2>Per-Speaker Accuracy</h2>
+        <canvas id="accuracyChart"></canvas>
+    </div>
+
+</div>
+
+<script>
+    const report = {{ metrics.classification_report | tojson }};
+    const labels = [];
+    const values = [];
+
+    for (const key in report) {
+        if (!isNaN(key)) {
+            labels.push(key);
+            values.push(report[key]["precision"]);
+        }
+    }
+
+    const ctx = document.getElementById("accuracyChart").getContext("2d");
+
+    new Chart(ctx, {
+        type: "bar",
+        data: {
+            labels: labels,
+            datasets: [{
+                label: "Precision",
+                data: values,
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                y: { beginAtZero: true }
+            }
+        }
+    });
+</script>
+
+</body>
+</html>
