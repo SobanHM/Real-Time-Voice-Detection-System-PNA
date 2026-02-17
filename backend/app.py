@@ -1,6 +1,7 @@
 import os
 import joblib
 import numpy as np
+import json
 
 from flask import Flask, request, jsonify, render_template
 from flask_cors import CORS
@@ -23,6 +24,12 @@ encoder = joblib.load(ENCODER_PATH)
 @app.route("/")
 def home():
     return render_template("index.html")
+
+@app.route("/dashboard")
+def dashboard():
+    with open("metrics/metrics.json") as f:
+        metrics = json.load(f)
+    return render_template("dashboard.html", metrics=metrics)
 
 
 @app.route("/predict", methods=["POST"])
